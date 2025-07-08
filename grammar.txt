@@ -1,0 +1,52 @@
+GRAMMAR       ::= DEF_LIST 'amin'
+
+DEF_LIST      ::= DEF 'don' { DEF 'don' }*
+
+DEF           ::= 'zamysel' IDENT '(' PARAMS ')' OPERATION
+               | OPERATION                               
+
+PARAMS        ::= IDENT { 'don' IDENT }*
+
+OPERATION     ::= IF
+               | WHILE
+               | PRINT
+               | RETURN
+               | CALL
+               | BLOCK
+               | ASSIGN
+
+IF            ::= 'koli' '(' COMPARISON ')' OPERATION
+
+WHILE         ::= 'dokole' '(' COMPARISON ')' OPERATION
+
+PRINT         ::= 'glagoli' '(' COMPARISON ')'
+
+RETURN        ::= 'vozvratishi' COMPARISON
+
+CALL          ::= 'propoy' IDENT '(' ARG_LIST ')'
+
+ASSIGN        ::= IDENT 'daBudet' ( CALL | COMPARISON )
+
+ARG_LIST      ::= IDENT { 'don' IDENT }*
+
+BLOCK         ::= '{' { OPERATION 'don' }* '}'
+
+COMPARISON    ::= EXPR [ REL_OP EXPR ]
+
+REL_OP        ::= 'bole' | 'mene' | 'yko'
+               | 'neMene' | 'neBole' | 'neYko'
+
+EXPR          ::= TERM { ['+', '-'] TERM }*
+
+TERM          ::= FACTOR { ['*', '/'] FACTOR }*
+
+FACTOR        ::= MATH_FUNC
+               | '(' COMPARISON ')'
+               | NUM
+               | IDENT
+
+MATH_FUNC     ::= ['sqrt', 'sin', 'cos'] '(' COMPARISON ')'
+
+IDENT         ::= ['a'-'z''A'-'Z'] ['a'-'z''A'-'Z''0'-'9']*
+
+NUM           ::= ['0'-'9']+ ['.' ['0'-'9']+ ]?
