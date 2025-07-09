@@ -36,7 +36,7 @@ FLAGS		  = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-l
 #--------------------------------------------------------------------------------------------------
 MYLIB_OBJ    = $(OBJ)myLib.o
 VECTOR_OBJ   = $(OBJ)vector.o
-FRONTEND_OBJ = $(OBJ)lexicalAnalysis.o
+FRONTEND_OBJ = $(OBJ)tree.o $(OBJ)lexicalAnalysis.o
 #--------------------------------------------------------------------------------------------------
 
 

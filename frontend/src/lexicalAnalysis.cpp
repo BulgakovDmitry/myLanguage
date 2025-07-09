@@ -1,4 +1,5 @@
 #include "../headers/lexicalAnalysis.hpp"
+#include "../headers/tree.hpp"
 #include <myLib.hpp>
 #include <ctype.h>
 
@@ -52,7 +53,7 @@ Vector splitIntoTokens(FILE* codeFile)
         else
             token->type = TYPE_IDENTIFIER;
 
-        vectorPush(&tokens, token); //tokens.push_back(token);
+        vectorPush(&tokens, token); 
         curr = strtok(NULL, " \n");
     }
 
@@ -61,7 +62,8 @@ Vector splitIntoTokens(FILE* codeFile)
 
 static bool isKeyWord(const char* word)
 {
-    static const char* const kKeywords[] = {
+    static const char* const kKeywords[] = 
+    {
         KEY_KOLI, KEY_DOKOLE, KEY_ADD,  KEY_SUB,  KEY_MUL,  KEY_DIV,
         KEY_AMIN, KEY_SIN, KEY_COS, KEY_PROPOY, KEY_ZAMYSEL, KEY_SQRT, KEY_GLAGOLI, KEY_VOZVRATISHI,
         KEY_MENE, KEY_BOLE, KEY_DON, KEY_YKO,
@@ -101,24 +103,6 @@ void destroyTokens(Vector* tokens)
     vectorDtor(tokens); 
 }
 
-void deleteNode(Node* node) 
-{
-    if (!node) return;
-
-    node->type = (Type)0;
-
-    if (node->value)
-        node->value = nullptr;
-
-    if (node->left)
-        node->left = nullptr;
-    
-    if (node->right)
-        node->right = nullptr;
-
-    FREE(node);
-}
-
 void tokenDump(const Vector tokens)
 {    
     printf(RED"___tokenDump_____________________________________________________________\n"RESET);
@@ -136,5 +120,4 @@ void tokenDump(const Vector tokens)
         printf("%s[%s%zu%s] %s\"%s%s%s\"%s\n", GREEN, MANG, i, GREEN, GREEN, CEAN, val, GREEN, RESET);
     }
     printf(RED"_________________________________________________________________________\n"RESET);
-
 }

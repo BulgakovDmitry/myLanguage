@@ -368,8 +368,8 @@ void vectorDump(const Vector vec)
 
     #ifdef VECTOR_CANARY_PROTECTION
     printf(GREEN "{ "
-        BLUE  "L_STACK_CANARY" GREEN " = " RED "%p" GREEN ", "
-        BLUE  "R_STACK_CANARY" GREEN " = " RED "%p" GREEN " }\n" RESET,
+        BLUE  "L_VECTOR_CANARY" GREEN " = " RED "%p" GREEN ", "
+        BLUE  "R_VECTOR_CANARY" GREEN " = " RED "%p" GREEN " }\n" RESET,
         vec.leftVectorCanary, vec.rightVectorCanary);
 
     printf(GREEN "{ "
