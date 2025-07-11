@@ -1,7 +1,7 @@
 #include "../headers/tree.hpp"
 #include <myLib.hpp>
 
-Node* newNode(Type type, char* value, Node* left, Node* right)
+Node* newNode(Type type, Value value, Node* left, Node* right)
 {
     Node* node = (Node*)calloc(1, sizeof(Node));
     ASSERT(node, "node = nullptr, calloc error", stderr);
@@ -28,12 +28,12 @@ void dtorTree(Node* node)
     if (node->left)  
     {
         dtorTree(node->left);
-        node->left = NULL;
+        node->left = nullptr;
     }
     if (node->right) 
     {
         dtorTree(node->right);
-        node->right = NULL;
+        node->right = nullptr;
     }    
     deleteNode(node);
 }
@@ -43,9 +43,11 @@ void deleteNode(Node* node)
     if (!node) return;
 
     node->type = (Type)0;
+    node->value.num = 0;
+    node->value.op = 0;
 
-    if (node->value)
-        node->value = nullptr;
+    if (node->value.id)
+        node->value.id = nullptr;
 
     if (node->left)
         node->left = nullptr;

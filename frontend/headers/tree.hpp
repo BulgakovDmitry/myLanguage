@@ -1,6 +1,8 @@
 #ifndef TREE_HPP
 #define TREE_HPP
 
+#include <stdio.h>
+
 enum Type
 {
     TYPE_NUMBER     = 1,
@@ -9,10 +11,17 @@ enum Type
     NUMBER_OF_TYPES
 };
 
+union Value
+{
+    double num;
+    size_t op;
+    char* id;
+};
+
 struct Node
 {
     Type type;
-    char* value;
+    Value value;
     Node* left;
     Node* right;
 };
@@ -49,7 +58,7 @@ enum Operations
     NUMBER_OF_OPERATIONS
 };
 
-Node* newNode   (Type type, char* value, Node* left, Node* right);
+Node* newNode   (Type type, Value value, Node* left, Node* right);
 void  deleteNode(Node* node); 
 void  dtorTree  (Node* node);
 
