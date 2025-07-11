@@ -6,6 +6,7 @@ enum Type
     TYPE_NUMBER     = 1,
     TYPE_OPERATION  = 2,
     TYPE_IDENTIFIER = 3,
+    NUMBER_OF_TYPES
 };
 
 struct Node
@@ -18,31 +19,40 @@ struct Node
 
 enum Operations
 {
-    OPERATION_NO,           //
-    OPERATION_DON,          // ;
-    OPERATION_ZAMYSEL,      // def
-    OPERATION_PROPOY,       // call
-    OPERATION_VOZVRATISHI,  // return
-    OPERATION_KOLI,         // if
-    OPERATION_DOKOLE,       // while
-    OPERATION_DA_BUDET,     // =
-    OPERATION_GLAGOLI,      // printf
-    OPERATION_SQRT,         // sqrt
-    OPERATION_SIN,          // sin
-    OPERATION_COS,          // cos
-    OPERATION_ADD,          // +
-    OPERATION_SUB,          // -
-    OPERATION_MUL,          // *
-    OPERATION_DIV,          // /
-    OPERATION_BOLE,         // >
-    OPERATION_MENE,         // <
-    OPERATION_NE_MENE,      // >=
-    OPERATION_NE_BOLE,      // <=
-    OPERATION_YKO,          // ==
-    OPERATION_NE_YKO,       // !=
+    OPERATION_NO,               //
+    OPERATION_BOND,             // ;
+    OPERATION_FUNC_DEF,         // def func
+    OPERATION_CALL,             // call
+    OPERARION_RETURN,           // return
+    OPERATION_ASSIGNMENT,       // =
+    OPERATION_IF,               // if
+    OPERATION_WHILE,            // while
+    OPERATION_PRINT,            // print
+    OPERATION_INPUT,            // scanf
+    OPERATION_EQUAL,            // ==
+    OPERATION_NOT_EQUAL,        // !=
+    OPERATION_GREATER,          // >
+    OPERATION_LESS,             // <
+    OPERATION_GREATER_OR_EQUAL, // >=
+    OPERATION_LESS_OR_EQUAL,    // <=
+    OPERATION_VAR_DEF,          // def var
+    OPERATION_SQRT,             // sqrt
+    OPERATION_SIN,              // sin
+    OPERATION_COS,              // cos
+    OPERATION_TG,               // tg
+    OPERATION_LN,               // ln
+    OPERATION_ADD,              // +
+    OPERATION_SUB,              // -
+    OPERATION_MUL,              // *
+    OPERATION_DIV,              // /
+    OPERATION_POW,              // ^
+    NUMBER_OF_OPERATIONS
 };
 
-void deleteNode(Node* node); 
+Node* newNode   (Type type, char* value, Node* left, Node* right);
+void  deleteNode(Node* node); 
+void  dtorTree  (Node* node);
+
 
 
 #endif
