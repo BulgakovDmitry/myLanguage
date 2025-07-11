@@ -69,7 +69,8 @@ static bool isKeyWord(const char* word)
         KEY_MENE, KEY_BOLE, KEY_DON, KEY_YKO,
         KEY_NE_YKO, KEY_NE_BOLE, KEY_NE_MENE,
         KEY_LEFT_PARENTHESIS,  KEY_RIGHT_PARENTHESIS,
-        KEY_LEFT_CURLY_BRACKET, KEY_RIGHT_CURLY_BRACKET
+        KEY_LEFT_CURLY_BRACKET, KEY_RIGHT_CURLY_BRACKET, 
+        KEY_POZHERTVUI, KEY_RADI
     };
 
     for (const char* kw : kKeywords)
