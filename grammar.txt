@@ -26,10 +26,9 @@ Add        ::= Mul ( ( '+' | '-' ) Mul )*
 Mul        ::= Pow ( ( '*' | '/' ) Pow )*
 Pow        ::= Unary ('^' Unary )*
 Unary      ::= ( '+' | '-' | FuncOper )? Primary
-FuncOper   ::= 'sin' | 'cos' | 'tg' | 'ln'
-Primary        ::= '(' Expression ')'| Var | Number
+FuncOper   ::= 'sin' | 'cos' | 'tg' | 'ln' | 'sqrt'
+Primary    ::= '(' Expression ')'| Var | Number
 
 Var        ::= ID
 ID         ::= ([a-z] | [A-Z])+
 Num        ::= ['0'-'9']+ 
-Space      ::= (' ' | '\t' | '\n' | '\r')*
