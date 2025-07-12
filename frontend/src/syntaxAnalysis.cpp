@@ -63,32 +63,42 @@ static Node* getPow       (size_t* pos, const Vector tokens);
 static Node* getUnary     (size_t* pos, const Vector tokens);
 static Node* getFuncOper  (size_t* pos, const Vector tokens);
 static Node* getPrimary   (size_t* pos, const Vector tokens);
-static Node* getVar       (size_t* pos, const Vector tokens);
-static Node* getID        (size_t* pos, const Vector tokens);
-static Node* getNum       (size_t* pos, const Vector tokens);
 
-#define CUR()           ( (KeyWord*)tokens.data[*pos] )
-#define NEXT()          ( (KeyWord*)tokens.data[*pos + 1] )
-#define IS(type)        ( CUR()->keyWordOperation == (type) )
+#define CUR()           ( ((Node*)vectorGet(&tokens, *pos)) )      
+#define NEXT()          ( ((Node*)vectorGet(&tokens, *pos + 1)) )    
+#define IS(type)        ( CUR()->value.op == (type) )
 
-#define REQUIRE(type)     \
-    do                    \
-    {                     \
-        if (!IS(type))    \
-            sintaxError();\
-        (*pos)++;         \
+#define REQUIRE(type)      \
+    do                     \
+    {                      \
+        if (!IS(type))     \
+        {                  \
+            sintaxError(); \
+            return nullptr;\
+        }                  \
+        (*pos)++;          \
     } while(0)          
 
-static inline bool isNumber    (const KeyWord* tk) { return tk->keyWordOperation == KEY_NO_OPERATION && isdigit(tk->keyWordName[0]); }
-static inline bool isIdentifier(const KeyWord* tk) { return tk->keyWordOperation == KEY_NO_OPERATION && isalpha(tk->keyWordName[0]); }
+static inline bool isNumber(const Node* node) 
+{
+    if (!node) return false; 
+    return node->type == TYPE_NUMBER; 
+}
+
+static inline bool isIdentifier(const Node* node) 
+{
+    if (!node) return false;
+    return node->type == TYPE_IDENTIFIER && node->value.id != nullptr;
+}
 
 Node* syntaxAnalysis(const Vector tokens)
-{
+{    
     size_t pos = 0;
 
     if (tokens.size == 0)
         return nullptr;
 
+    
     Node* root = getProgram(&pos, tokens);
     
     if (pos != tokens.size)
@@ -117,9 +127,10 @@ static Node* getStmtList(size_t* pos, const Vector tokens)
 {
     Node* list = nullptr;
 
-    while (!IS(KEY_AMIN_OPERATION) && !IS(KEY_RIGHT_CURLY_BRACKET_OPERATION))
+    while (*pos < tokens.size && !IS(KEY_AMIN_OPERATION) && !IS(KEY_RIGHT_CURLY_BRACKET_OPERATION))
     {
         Node* stmt = getStatement(pos, tokens);
+        if (*pos >= tokens.size) break;
         REQUIRE(KEY_DON_OPERATION);
 
         if (!list) list = stmt;
@@ -135,21 +146,22 @@ static Node* getStmtList(size_t* pos, const Vector tokens)
 //------------------------------------------------------------------------------
 static Node* getStatement(size_t* pos, const Vector tokens)
 {
-    if      (IS(KEY_KOLI_OPERATION))         return getIfStmt   (pos, tokens);
-    else if (IS(KEY_DOKOLE_OPERATION))       return getWhileStmt(pos, tokens);
+    if      (IS(KEY_KOLI_OPERATION))   return getIfStmt   (pos, tokens);
+    else if (IS(KEY_DOKOLE_OPERATION)) return getWhileStmt(pos, tokens);
     else if (IS(KEY_DA_OPERATION))
     {
-        if      (NEXT()->keyWordOperation == KEY_BUDET_OPERATION)     return getAssignment(pos, tokens);
-        else if (NEXT()->keyWordOperation == KEY_PRIBUDET_OPERATION)  return getVarDef    (pos, tokens);
-        else sintaxError();
+        if (*pos + 1 >= tokens.size)                          return nullptr;
+        if      (NEXT()->value.op == KEY_BUDET_OPERATION)     return getAssignment(pos, tokens);
+        else if (NEXT()->value.op == KEY_PRIBUDET_OPERATION)  return getVarDef    (pos, tokens);
+        else    {sintaxError(); return nullptr;}
     }
     else if (IS(KEY_ZAMYSEL_OPERATION))     return getFuncDef  (pos, tokens);
     else if (IS(KEY_VOZVRATISHI_OPERATION)) return getReturn   (pos, tokens);
     else if (IS(KEY_POZHERTVUI_OPERATION))  return getInput    (pos, tokens);
     else if (IS(KEY_GLAGOLI_OPERATION))     return getPrint    (pos, tokens);
-    else if (isIdentifier(CUR()) && NEXT()->keyWordOperation == KEY_LEFT_PARENTHESIS_OPERATION)
+    else if (isIdentifier(CUR()) && NEXT()->value.op == KEY_LEFT_PARENTHESIS_OPERATION)
                                             return getFuncCall (pos, tokens);
-    else sintaxError();
+    else {sintaxError(); return nullptr;}
 
     return nullptr; 
 }
@@ -187,12 +199,13 @@ static Node* getWhileStmt(size_t* pos, const Vector tokens)
 //------------------------------------------------------------------------------
 static Node* getAssignment(size_t* pos, const Vector tokens)
 {
+    PRINT(4);
     REQUIRE(KEY_DA_OPERATION);
     REQUIRE(KEY_BUDET_OPERATION);
 
-    KeyWord* idTok = CUR();
-    Node* var    = _ID(strdup(idTok->keyWordName));
-    REQUIRE(KEY_NO_OPERATION); 
+    Node* idTok = CUR();
+    Node* var   = _ID(strdup(idTok->value.id));
+    (*pos)++;
 
     REQUIRE(KEY_PODOBNO_OPERATION);
     Node* expr = getExpression(pos, tokens);
@@ -208,10 +221,14 @@ static Node* getVarDef(size_t* pos, const Vector tokens)
     REQUIRE(KEY_DA_OPERATION);
     REQUIRE(KEY_PRIBUDET_OPERATION);
 
-    KeyWord* idTok = CUR();
-    Node* var    = _ID(strdup(idTok->keyWordName));
-    REQUIRE(KEY_NO_OPERATION);
-
+    Node* idTok = CUR();
+    Node* var   = _ID(strdup(idTok->value.id));
+    (*pos)++;
+    if (*pos >= tokens.size || !IS(KEY_PODOBNO_OPERATION)) 
+    {
+        sintaxError();
+        return nullptr;
+    }
     REQUIRE(KEY_PODOBNO_OPERATION);
     Node* expr = getExpression(pos, tokens);
 
@@ -225,10 +242,18 @@ static Node* getFuncDef(size_t* pos, const Vector tokens)
 {
     REQUIRE(KEY_ZAMYSEL_OPERATION);
 
-    KeyWord* idTok  = CUR();
-    char*  fName  = strdup(idTok->keyWordName);
+    Node* idTok  = CUR();
+
+    char* fName = strdup(idTok->value.id);
+    if (!fName) 
+    {
+        fprintf(stderr, RED"Memory allocation failed\n"RED);
+        sintaxError();
+        return nullptr;
+    }
+
     Node*  idNode = _ID(fName);
-    REQUIRE(KEY_NO_OPERATION);               
+    (*pos)++;              
 
     REQUIRE(KEY_LEFT_PARENTHESIS_OPERATION);
     Node* params = nullptr;
@@ -250,15 +275,15 @@ static Node* getFuncDef(size_t* pos, const Vector tokens)
 //------------------------------------------------------------------------------
 static Node* getParamList(size_t* pos, const Vector tokens)
 {
-    Node* first = _ID(strdup(CUR()->keyWordName));
-    REQUIRE(KEY_NO_OPERATION);
+    Node* first = _ID(strdup(CUR()->value.id));
+    (*pos)++;
 
     Node* list = first;
     while (IS(KEY_ZAP_OPERATION))
     {
-        ++(*pos);
-        Node* nxt = _ID(strdup(CUR()->keyWordName));
-        REQUIRE(KEY_NO_OPERATION);
+        (*pos)++;;
+        Node* nxt = _ID(strdup(CUR()->value.id));
+        (*pos)++;
         list = _BOND(list, nxt);
     }
     return list;
@@ -281,9 +306,9 @@ static Node* getInput(size_t* pos, const Vector tokens)
 {
     REQUIRE(KEY_POZHERTVUI_OPERATION);
     REQUIRE(KEY_RADI_OPERATION);
-    KeyWord* idTok = CUR();
-    Node* var    = _ID(strdup(idTok->keyWordName));
-    REQUIRE(KEY_NO_OPERATION);
+    Node* idTok = CUR();
+    Node* var    = _ID(strdup(idTok->value.id));
+    (*pos)++;
     return _INPUT(var);
 }
 
@@ -303,9 +328,9 @@ static Node* getPrint(size_t* pos, const Vector tokens)
 //------------------------------------------------------------------------------
 static Node* getFuncCall(size_t* pos, const Vector tokens)
 {
-    KeyWord* idTok = CUR();
-    Node* callee = _ID(strdup(idTok->keyWordName));
-    REQUIRE(KEY_NO_OPERATION);
+    Node* idTok = CUR();
+    Node* callee = _ID(strdup(idTok->value.id));
+    (*pos)++;
 
     REQUIRE(KEY_LEFT_PARENTHESIS_OPERATION);
     Node* args = nullptr;
@@ -326,7 +351,7 @@ static Node* getArgList(size_t* pos, const Vector tokens)
 
     while (IS(KEY_ZAP_OPERATION))
     {
-        ++(*pos);
+        (*pos)++;;
         Node* nxt = getExpression(pos, tokens);
         list = _BOND(list, nxt);
     }
@@ -346,7 +371,7 @@ static Node* getEquality(size_t* pos, const Vector tokens)
     Node* node = getRel(pos, tokens);
     while (IS(KEY_EQUAL_OPERATION) || IS(KEY_NOT_EQUAL_OPERATION))
     {
-        size_t op = CUR()->keyWordOperation; ++(*pos);
+        size_t op = CUR()->value.op; (*pos)++;;
         Node* rhs = getRel(pos, tokens);
         node = (op == KEY_EQUAL_OPERATION) ? _EQUAL(node, rhs) : _NOT_EQUAL(node, rhs);
     }
@@ -362,7 +387,7 @@ static Node* getRel(size_t* pos, const Vector tokens)
     while (IS(KEY_LESS_OPERATION) || IS(KEY_GREATER_OPERATION) ||
            IS(KEY_LESS_OR_EQUAL_OPERATION) || IS(KEY_GREATER_OR_EQUAL_OPERATION))
     {
-        size_t op = CUR()->keyWordOperation; ++(*pos);
+        size_t op = CUR()->value.op; (*pos)++;;
         Node* rhs = getAddSub(pos, tokens);
         switch (op)
         {
@@ -370,7 +395,7 @@ static Node* getRel(size_t* pos, const Vector tokens)
             case KEY_GREATER_OPERATION:           node = _GREATER(node, rhs);           break;
             case KEY_LESS_OR_EQUAL_OPERATION:     node = _LESS_OR_EQUAL(node, rhs);     break;
             case KEY_GREATER_OR_EQUAL_OPERATION:  node = _GREATER_OR_EQUAL(node, rhs);  break;
-            default: sintaxError();
+            default: {sintaxError(); return nullptr;}
         }
     }
     return node;
@@ -384,7 +409,7 @@ static Node* getAddSub(size_t* pos, const Vector tokens)
     Node* node = getMulDiv(pos, tokens);
     while (IS(KEY_ADD_OPERATION) || IS(KEY_SUB_OPERATION))
     {
-        size_t op = CUR()->keyWordOperation; ++(*pos);
+        size_t op = CUR()->value.op; (*pos)++;;
         Node* rhs = getMulDiv(pos, tokens);
         node = (op == KEY_ADD_OPERATION) ? _ADD(node, rhs) : _SUB(node, rhs);
     }
@@ -399,7 +424,7 @@ static Node* getMulDiv(size_t* pos, const Vector tokens)
     Node* node = getPow(pos, tokens);
     while (IS(KEY_MUL_OPERATION) || IS(KEY_DIV_OPERATION))
     {
-        size_t op = CUR()->keyWordOperation; ++(*pos);
+        size_t op = CUR()->value.op; (*pos)++;;
         Node* rhs = getPow(pos, tokens);
         node = (op == KEY_MUL_OPERATION) ? _MUL(node, rhs) : _DIV(node, rhs);
     }
@@ -414,7 +439,7 @@ static Node* getPow(size_t* pos, const Vector tokens)
     Node* node = getUnary(pos, tokens);
     while (IS(KEY_POW_OPERATION))
     {
-        ++(*pos);
+        (*pos)++;;
         Node* rhs = getUnary(pos, tokens);
         node = _POW(node, rhs);
     }
@@ -426,8 +451,8 @@ static Node* getPow(size_t* pos, const Vector tokens)
 //------------------------------------------------------------------------------
 static Node* getUnary(size_t* pos, const Vector tokens)
 {
-    if (IS(KEY_ADD_OPERATION))            { ++(*pos); return getUnary(pos, tokens); }
-    else if (IS(KEY_SUB_OPERATION))       { ++(*pos); return _SUB(_NUM(0), getUnary(pos, tokens)); }
+    if (IS(KEY_ADD_OPERATION))            { (*pos)++;return getUnary(pos, tokens); }
+    else if (IS(KEY_SUB_OPERATION))       { (*pos)++;return _SUB(_NUM(0), getUnary(pos, tokens)); }
     else if (IS(KEY_SIN_OPERATION)  || IS(KEY_COS_OPERATION) || IS(KEY_TG_OPERATION) ||
              IS(KEY_LN_OPERATION)   || IS(KEY_SQRT_OPERATION))
         return getFuncOper(pos, tokens);
@@ -440,7 +465,7 @@ static Node* getUnary(size_t* pos, const Vector tokens)
 //------------------------------------------------------------------------------
 static Node* getFuncOper(size_t* pos, const Vector tokens)
 {
-    size_t op = CUR()->keyWordOperation; ++(*pos);
+    size_t op = CUR()->value.op; (*pos)++;;
     Node* arg = getPrimary(pos, tokens);
     switch (op)
     {
@@ -449,7 +474,7 @@ static Node* getFuncOper(size_t* pos, const Vector tokens)
         case KEY_TG_OPERATION:   return _TG  (arg);
         case KEY_LN_OPERATION:   return _LN  (arg);
         case KEY_SQRT_OPERATION: return _SQRT(arg);
-        default: sintaxError();
+        default: {sintaxError(); return nullptr;}
     }
 }
 
@@ -458,24 +483,30 @@ static Node* getFuncOper(size_t* pos, const Vector tokens)
 //------------------------------------------------------------------------------
 static Node* getPrimary(size_t* pos, const Vector tokens)
 {
+    if (*pos >= tokens.size || !CUR()) 
+    {
+        sintaxError();
+        return nullptr;
+    }
+
     if (IS(KEY_LEFT_PARENTHESIS_OPERATION))
     {
-        ++(*pos);
+        (*pos)++;;
         Node* expr = getExpression(pos, tokens);
         REQUIRE(KEY_RIGHT_PARENTHESIS_OPERATION);
         return expr;
     }
     else if (isNumber(CUR()))
     {
-        double val = strtod(CUR()->keyWordName, nullptr);
-        ++(*pos);
+        double val = CUR()->value.num;
+        (*pos)++;;
         return _NUM(val);
     }
     else if (isIdentifier(CUR()))
     {
-        char* name = strdup(CUR()->keyWordName);
-        ++(*pos);
+        char* name = strdup(CUR()->value.id);
+        (*pos)++;;
         return _ID(name);
     }
-    else sintaxError();
+    else {sintaxError(); return nullptr;}
 }

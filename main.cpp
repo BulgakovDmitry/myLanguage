@@ -1,4 +1,5 @@
 #include "frontend/headers/lexicalAnalysis.hpp"
+#include "frontend/headers/syntaxAnalysis.hpp"
 #include <myLib.hpp>
 
 extern const char* const codeFileName;
@@ -12,7 +13,11 @@ int main()
     FCLOSE(codeFile);           
 
     tokenDump(tokens);
+
+    Node* root = syntaxAnalysis(tokens);
+
     destroyTokens(&tokens);
+    dtorTree(root);
 
     return 0;
 }

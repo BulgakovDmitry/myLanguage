@@ -20,8 +20,10 @@ OBJ  = obj/
 INCLUDE_FLAGS = -I$(LIB) -I$(VEC) -I$(HPP) 
 SANITAZER     = -fsanitize=address
 SFML_FLAGS    = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio 
+GDB           = -g
+OPTIMIZ_OF    = -O0
 
-FLAGS		  = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loop-optimizations -Wc++14-compat -Wmissing-declarations \
+FLAGS		  = -D _DEBUG -ggdb3 -std=c++17 $(OPTIMIZ_OF) -Wall -Wextra -Weffc++ -Waggressive-loop-optimizations -Wc++14-compat -Wmissing-declarations \
 			    -Wcast-align -Wcast-qual -Wchar-subscripts -Wconditionally-supported -Wctor-dtor-privacy -Wempty-body -Wfloat-equal          \
 			    -Wformat-nonliteral -Wformat-security -Wformat-signedness -Wformat=2 -Winline -Wlogical-op -Wnon-virtual-dtor -Wopenmp-simd  \
 				-Woverloaded-virtual -Wpacked -Wpointer-arith -Winit-self -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel     \
@@ -36,7 +38,7 @@ FLAGS		  = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-l
 #--------------------------------------------------------------------------------------------------
 MYLIB_OBJ    = $(OBJ)myLib.o
 VECTOR_OBJ   = $(OBJ)vector.o
-FRONTEND_OBJ = $(OBJ)tree.o $(OBJ)lexicalAnalysis.o
+FRONTEND_OBJ = $(OBJ)tree.o $(OBJ)lexicalAnalysis.o $(OBJ)syntaxAnalysis.o
 #--------------------------------------------------------------------------------------------------
 
 

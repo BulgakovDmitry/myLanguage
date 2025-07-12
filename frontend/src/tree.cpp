@@ -18,6 +18,13 @@ Node* newNode(Type type, Value value, Node* left, Node* right)
     node->left  = left;
     node->right = right;
 
+    if (type == TYPE_IDENTIFIER && !value.id) 
+    {
+        fprintf(stderr, RED"Identifier name is null\n"RESET);
+        FREE(node);
+        return nullptr;
+    }
+
     return node;
 }
 
@@ -35,6 +42,11 @@ void dtorTree(Node* node)
         dtorTree(node->right);
         node->right = nullptr;
     }    
+
+    if (node->type == TYPE_IDENTIFIER && node->value.id) 
+        FREE(node->value.id); 
+    
+
     deleteNode(node);
 }
 
@@ -57,3 +69,38 @@ void deleteNode(Node* node)
 
     FREE(node);
 }
+
+/*void dumpGraph(Node* node, FILE* file)
+{
+    ASSERT(node, "node = nullptr", stderr);
+    ASSERT(file, "file = nullptr", stderr);
+
+
+    //snprintf(gvPath,  sizeof(gvPath),  "dumpGraph/%s.gv",  filePrefix);
+    //snprintf(pngPath, sizeof(pngPath), "dumpGraph/%s.png", filePrefix);
+
+    FILE* gv = fopen("dumpGraph.gv", "wb");
+    ASSERT(gv, "dumpGraph fopen", stderr);
+
+    fprintf(gv, "digraph G {\n");
+    fprintf(gv, "    node [style=filled, fontcolor=darkblue,"
+                " fillcolor=peachpuff, color=\"#252A34\", penwidth=2.5];\n");
+    fprintf(gv, "    bgcolor=\"lemonchiffon\";\n\n");
+
+    dumpListNodes(node, gv);
+    dumpConnectNodes(node, gv);
+    fprintf(gv, "}\n");
+
+    FCLOSE(gv);
+
+    char cmd[2 * MAX_NAME_FILE_LEN + EXTRA_SPACE] = "";
+    snprintf(cmd, sizeof(cmd), "dot %s -Tpng -o %s", gvPath, pngPath);
+    system(cmd);
+
+    fprintf(html,
+        "<div class=\"pair\">"
+        "<img src=\"%s.png\" alt=\"%s\">"
+        "<span>it's %s</span>"
+        "</div>\n",
+        filePrefix, filePrefix, filePrefix);
+}*/
