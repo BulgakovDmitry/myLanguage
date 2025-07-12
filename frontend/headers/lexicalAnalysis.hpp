@@ -7,6 +7,7 @@
 
 const char* const codeFileName = "codeFile.txt";
 
+const char* const KEY_NO_NAME                  = "\0";            // \0
 const char* const KEY_DON_NAME                 = "don";           // ;
 const char* const KEY_ZAMYSEL_NAME             = "zamysel";       // func def
 const char* const KEY_ZAP_NAME                 = ",";             // ,
@@ -25,12 +26,13 @@ const char* const KEY_YASNO_NAME               = "yasno";         // printf (2)
 const char* const KEY_SQRT_NAME                = "sqrt";          // sqrt
 const char* const KEY_SIN_NAME                 = "sin";           // sin
 const char* const KEY_COS_NAME                 = "cos";           // cos
-const char* const KEY_TG_NAME                 = "tg";            // tg
+const char* const KEY_TG_NAME                 = "tg";             // tg
 const char* const KEY_LN_NAME                  = "ln";            // ln
 const char* const KEY_ADD_NAME                 = "+";             // +
 const char* const KEY_SUB_NAME                 = "-";             // -
 const char* const KEY_MUL_NAME                 = "*";             // *
 const char* const KEY_DIV_NAME                 = "/";             // /
+const char* const KEY_POW_NAME                 = "^";             // ^
 const char* const KEY_EQUAL_NAME               = "==";            // ==   
 const char* const KEY_NOT_EQUAL_NAME           = "!=";            // !=   
 const char* const KEY_GREATER_NAME             = ">";             // >
@@ -70,6 +72,7 @@ enum TokenOperation
     KEY_SUB_OPERATION,
     KEY_MUL_OPERATION,
     KEY_DIV_OPERATION,
+    KEY_POW_OPERATION,
     KEY_EQUAL_OPERATION,
     KEY_NOT_EQUAL_OPERATION,
     KEY_GREATER_OPERATION,

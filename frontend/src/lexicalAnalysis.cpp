@@ -80,6 +80,7 @@ static KeyWord isKeyWord(const char* word)
         {KEY_SUB_OPERATION,                 KEY_SUB_NAME,                 false}, 
         {KEY_MUL_OPERATION,                 KEY_MUL_NAME,                 false}, 
         {KEY_DIV_OPERATION,                 KEY_DIV_NAME,                 false}, 
+        {KEY_POW_OPERATION,                 KEY_POW_NAME,                 false},
         {KEY_EQUAL_OPERATION,               KEY_EQUAL_NAME,               false}, 
         {KEY_NOT_EQUAL_OPERATION,           KEY_NOT_EQUAL_NAME,           false}, 
         {KEY_GREATER_OPERATION,             KEY_GREATER_NAME,             false}, 
