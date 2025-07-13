@@ -19,7 +19,7 @@
 // FuncDef     ::= 'zamysel' ID '(' [ ParamList ] ')' '{' StmtList '}'
 // ParamList   ::= Var { ',' Var }
 //
-// Return      ::= 'vozvratishi' Expression
+// Return      ::= 'vozvratiti' Expression
 // Input       ::= 'pozhertvui' 'radi' Var
 // Print       ::= 'glagoli' 'yasno' Expression
 // FuncCall    ::= ID '(' [ ArgList ] ')'
@@ -156,7 +156,7 @@ static Node* getStatement(size_t* pos, const Vector tokens)
         else    {syntaxError(); return nullptr;}
     }
     else if (IS(KEY_ZAMYSEL_OPERATION))     return getFuncDef  (pos, tokens);
-    else if (IS(KEY_VOZVRATISHI_OPERATION)) return getReturn   (pos, tokens);
+    else if (IS(KEY_VOZVRATITI_OPERATION))  return getReturn   (pos, tokens);
     else if (IS(KEY_POZHERTVUI_OPERATION))  return getInput    (pos, tokens);
     else if (IS(KEY_GLAGOLI_OPERATION))     return getPrint    (pos, tokens);
     else if (isIdentifier(CUR()) && NEXT()->value.op == KEY_LEFT_PARENTHESIS_OPERATION)
@@ -280,11 +280,11 @@ static Node* getParamList(size_t* pos, const Vector tokens)
 }
 
 //------------------------------------------------------------------------------
-//  Return ::= 'vozvratishi' Expression
+//  Return ::= 'vozvratiti' Expression
 //------------------------------------------------------------------------------
 static Node* getReturn(size_t* pos, const Vector tokens)
 {
-    REQUIRE(KEY_VOZVRATISHI_OPERATION);
+    REQUIRE(KEY_VOZVRATITI_OPERATION);
     Node* expr = getExpression(pos, tokens);
     return _RETURN(expr);
 }
@@ -479,7 +479,6 @@ static Node* getPrimary(size_t* pos, const Vector tokens)
         return nullptr;
     }
 
-    /* ---------------- ( Expression ) ---------------- */
     if (IS(KEY_LEFT_PARENTHESIS_OPERATION))
     {
         (*pos)++;;
@@ -488,7 +487,6 @@ static Node* getPrimary(size_t* pos, const Vector tokens)
         return expr;
     }
     
-    /* ------------------- Number --------------------- */
     if (isNumber(CUR()))
     {
         double val = CUR()->value.num;
@@ -496,7 +494,6 @@ static Node* getPrimary(size_t* pos, const Vector tokens)
         return _NUM(val);
     }
 
-    /* --------------- Var  |  FuncCall --------------- */
     if (isIdentifier(CUR()))
     {
         if (*pos + 1 < tokens.size && NEXT()->value.op == KEY_LEFT_PARENTHESIS_OPERATION)

@@ -1,7 +1,7 @@
 #ifndef DSL_HPP
 #define DSL_HPP
 
-#include "tree.hpp"
+#include "../common/headers/tree.hpp"
 
 #define OP_VALUE(oper)  Value {.op  = (oper)}
 #define NUM_VALUE(n)     Value {.num = (n)   }

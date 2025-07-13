@@ -1,10 +1,10 @@
 zamysel bogatit ( x )
 {
-    dokole ( x < 10 )
+    koli ( x < 10 )
     {
-        da budet x podobno x + 1 don
+        da budet x podobno x * 0 don
     } don
-    vozvratishi x don
+    vozvratiti x don
 } don
 
 da pribudet y podobno bogatit ( 5 ) don

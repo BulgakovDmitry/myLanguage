@@ -7,7 +7,9 @@ COMPILER = g++
 
 #--------------------------------------------------------------------------------------------------
 FRON = frontend/
+MIDD = middleend/
 BACK = backend/
+COMM = common/
 SRC  = src/
 HPP  = headers/
 LIB  = myLib/
@@ -36,9 +38,11 @@ FLAGS		  = -D _DEBUG -ggdb3 -std=c++17 $(OPTIMIZ_OF) -Wall -Wextra -Weffc++ -Wag
 
 
 #--------------------------------------------------------------------------------------------------
-MYLIB_OBJ    = $(OBJ)myLib.o
-VECTOR_OBJ   = $(OBJ)vector.o
-FRONTEND_OBJ = $(OBJ)tree.o $(OBJ)lexicalAnalysis.o $(OBJ)syntaxAnalysis.o
+MYLIB_OBJ     = $(OBJ)myLib.o
+VECTOR_OBJ    = $(OBJ)vector.o
+COMMON_OBJ    = $(OBJ)tree.o
+FRONTEND_OBJ  = $(OBJ)lexicalAnalysis.o $(OBJ)syntaxAnalysis.o
+MIDDLEEND_OBJ = $(OBJ)optimizations.o
 #--------------------------------------------------------------------------------------------------
 
 
@@ -57,7 +61,7 @@ clean:
 
 
 #--------------------------------------------------------------------------------------------------
-language: $(MYLIB_OBJ) $(VECTOR_OBJ) $(FRONTEND_OBJ) $(OBJ)main.o 
+language: $(MYLIB_OBJ) $(VECTOR_OBJ) $(COMMON_OBJ) $(FRONTEND_OBJ) $(MIDDLEEND_OBJ) $(OBJ)main.o 
 	$(COMPILER) $^ -o language.out $(FLAGS)
 #--------------------------------------------------------------------------------------------------
 
@@ -69,7 +73,13 @@ $(OBJ)%.o : $(LIB)%.cpp
 $(OBJ)%.o : $(VEC)%.cpp
 	$(COMPILER) $(FLAGS) -c $< -o $@
 
+$(OBJ)%.o : $(COMM)$(SRC)%.cpp
+	$(COMPILER) $(FLAGS) -c $< -o $@
+
 $(OBJ)%.o : $(FRON)$(SRC)%.cpp
+	$(COMPILER) $(FLAGS) -c $< -o $@
+
+$(OBJ)%.o : $(MIDD)$(SRC)%.cpp
 	$(COMPILER) $(FLAGS) -c $< -o $@
 
 $(OBJ)%.o : %.cpp

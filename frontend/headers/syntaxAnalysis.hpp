@@ -3,7 +3,7 @@
 
 #include <vector.hpp>
 #include <myLib.hpp>
-#include "tree.hpp"
+#include "../common/headers/tree.hpp"
 #include "dsl.hpp"
 
 Node* syntaxAnalysis(const Vector tokens);

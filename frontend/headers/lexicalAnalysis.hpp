@@ -12,7 +12,7 @@ const char* const KEY_DON_NAME                 = "don";           // ;
 const char* const KEY_ZAMYSEL_NAME             = "zamysel";       // func def
 const char* const KEY_ZAP_NAME                 = ",";             // ,
 const char* const KEY_PROPOY_NAME              = "propoy";        // func call 
-const char* const KEY_VOZVRATISHI_NAME         = "vozvratishi";   // return
+const char* const KEY_VOZVRATITI_NAME          = "vozvratiti";    // return
 const char* const KEY_POZHERTVUI_NAME          = "pozhertvui";    // scan (1)
 const char* const KEY_RADI_NAME                = "radi";          // scan (2)
 const char* const KEY_KOLI_NAME                = "koli";          // if
@@ -26,7 +26,7 @@ const char* const KEY_YASNO_NAME               = "yasno";         // printf (2)
 const char* const KEY_SQRT_NAME                = "sqrt";          // sqrt
 const char* const KEY_SIN_NAME                 = "sin";           // sin
 const char* const KEY_COS_NAME                 = "cos";           // cos
-const char* const KEY_TG_NAME                 = "tg";             // tg
+const char* const KEY_TG_NAME                  = "tg";            // tg
 const char* const KEY_LN_NAME                  = "ln";            // ln
 const char* const KEY_ADD_NAME                 = "+";             // +
 const char* const KEY_SUB_NAME                 = "-";             // -
@@ -52,7 +52,7 @@ enum TokenOperation
     KEY_ZAMYSEL_OPERATION,
     KEY_ZAP_OPERATION,
     KEY_PROPOY_OPERATION,
-    KEY_VOZVRATISHI_OPERATION,
+    KEY_VOZVRATITI_OPERATION,
     KEY_POZHERTVUI_OPERATION,
     KEY_RADI_OPERATION,
     KEY_KOLI_OPERATION,

@@ -1,5 +1,5 @@
 #include "../headers/lexicalAnalysis.hpp"
-#include "../headers/tree.hpp"
+#include "../common/headers/tree.hpp"
 #include <myLib.hpp>
 #include <ctype.h>
 
@@ -60,7 +60,7 @@ static KeyWord isKeyWord(const char* word)
         {KEY_ZAMYSEL_OPERATION,             KEY_ZAMYSEL_NAME,             false}, 
         {KEY_ZAP_OPERATION,                 KEY_ZAP_NAME,                 false}, 
         {KEY_PROPOY_OPERATION,              KEY_PROPOY_NAME,              false}, 
-        {KEY_VOZVRATISHI_OPERATION,         KEY_VOZVRATISHI_NAME,         false},
+        {KEY_VOZVRATITI_OPERATION,          KEY_VOZVRATITI_NAME,          false},
         {KEY_POZHERTVUI_OPERATION,          KEY_POZHERTVUI_NAME,          false}, 
         {KEY_RADI_OPERATION,                KEY_RADI_NAME,                false}, 
         {KEY_KOLI_OPERATION,                KEY_KOLI_NAME,                false}, 

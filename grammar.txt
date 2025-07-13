@@ -1,0 +1,34 @@
+Program     ::= StmtList 'amin'
+StmtList    ::= { Statement 'don' }
+
+Statement   ::= Assignment | IfStmt  | WhileStmt | 
+                VarDef     | FuncDef | FuncCall  | 
+                Return     | Input   | Print
+
+IfStmt      ::= 'koli'   Expression '{' StmtList '}'
+WhileStmt   ::= 'dokole' Expression '{' StmtList '}'
+
+Assignment  ::= 'da' 'budet'    Var 'podobno' Expression
+VarDef      ::= 'da' 'pribudet' Var 'podobno' Expression 
+FuncDef     ::= 'zamysel' ID '(' [ ParamList ] ')' '{' StmtList '}'
+ParamList   ::= Var { ',' Var }
+
+Return      ::= 'vozvratishi' Expression
+Input       ::= 'pozhertvui' 'radi' Var
+Print       ::= 'glagoli' 'yasno' Expression
+FuncCall    ::= ID '(' [ ArgList ] ')'
+ArgList     ::= Expression { ',' Expression }
+
+Expression  ::= Equality
+Equality    ::= Rel ( ( '==' | '!=' ) Rel )*
+Rel         ::= AddSub ( ( '<' | '>' | '<=' | '>=' ) AddSub )*
+AddSub      ::= MulDiv ( ( '+' | '-' ) MulDiv )*
+MulDiv      ::= Pow ( ( '*' | '/' ) Pow )*
+Pow         ::= Unary ('^' Unary )*
+Unary       ::= ( '+' | '-' | FuncOper )? Primary
+FuncOper    ::= 'sin' | 'cos' | 'tg' | 'ln' | 'sqrt'
+Primary     ::= '(' Expression ')'| Var | Number | FuncCall
+
+Var         ::= ID
+ID          ::= ([a-z] | [A-Z])+
+Num         ::= ['0'-'9']+ 
