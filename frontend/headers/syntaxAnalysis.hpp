@@ -8,7 +8,7 @@
 
 Node* syntaxAnalysis(const Vector tokens);
 
-inline void sintaxError()
+inline void syntaxError()
 {
     fprintf(stderr, RED"syntax error, please, rewrite your code\n"RESET);
     abort();

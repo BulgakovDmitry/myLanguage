@@ -58,10 +58,17 @@ enum Operations
     NUMBER_OF_OPERATIONS
 };
 
+const size_t MAX_NAME_FILE_LEN = 32;
+const size_t EXTRA_SPACE       = 15;
+
+const char* const DUMP_FILE_GV  = "frontend/graphDump/dumpGraph.gv";
+const char* const DUMP_FILE_PNG = "frontend/graphDump/dumpGraph.png";
+
 Node* newNode   (Type type, Value value, Node* left, Node* right);
 void  deleteNode(Node* node); 
 void  dtorTree  (Node* node);
 
+void dumpGraph(Node* node);
 
 
 #endif

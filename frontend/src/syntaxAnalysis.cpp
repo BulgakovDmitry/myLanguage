@@ -11,33 +11,33 @@
 //                 VarDef     | FuncDef | FuncCall  | 
 //                 Return     | Input   | Print
 //
-// IfStmt     ::= 'koli'   Expression '{' StmtList '}'
-// WhileStmt  ::= 'dokole' Expression '{' StmtList '}'
+// IfStmt      ::= 'koli'   Expression '{' StmtList '}'
+// WhileStmt   ::= 'dokole' Expression '{' StmtList '}'
 //
-// Assignment ::= 'da' 'budet'    Var 'podobno' Expression
-// VarDef     ::= 'da' 'pribudet' Var 'podobno' Expression 
-// FuncDef    ::= 'zamysel' ID '(' [ ParamList ] ')' '{' StmtList '}'
-// ParamList  ::= Var { ',' Var }
+// Assignment  ::= 'da' 'budet'    Var 'podobno' Expression
+// VarDef      ::= 'da' 'pribudet' Var 'podobno' Expression 
+// FuncDef     ::= 'zamysel' ID '(' [ ParamList ] ')' '{' StmtList '}'
+// ParamList   ::= Var { ',' Var }
 //
-// Return     ::= 'vozvratishi' Expression
-// Input      ::= 'pozhertvui' 'radi' Var
-// Print      ::= 'glagoli' 'yasno' Expression
-// FuncCall   ::= ID '(' [ ArgList ] ')'
-// ArgList    ::= Expression { ',' Expression }
+// Return      ::= 'vozvratishi' Expression
+// Input       ::= 'pozhertvui' 'radi' Var
+// Print       ::= 'glagoli' 'yasno' Expression
+// FuncCall    ::= ID '(' [ ArgList ] ')'
+// ArgList     ::= Expression { ',' Expression }
 //
-// Expression ::= Equality
-// Equality   ::= Rel ( ( '==' | '!=' ) Rel )*
-// Rel        ::= AddSub ( ( '<' | '>' | '<=' | '>=' ) AddSub )*
-// AddSub     ::= MulDiv ( ( '+' | '-' ) MulDiv )*
-// MulDiv     ::= Pow ( ( '*' | '/' ) Pow )*
-// Pow        ::= Unary ('^' Unary )*
-// Unary      ::= ( '+' | '-' | FuncOper )? Primary
-// FuncOper   ::= 'sin' | 'cos' | 'tg' | 'ln' | 'sqrt'
-// Primary    ::= '(' Expression ')'| Var | Number
+// Expression  ::= Equality
+// Equality    ::= Rel ( ( '==' | '!=' ) Rel )*
+// Rel         ::= AddSub ( ( '<' | '>' | '<=' | '>=' ) AddSub )*
+// AddSub      ::= MulDiv ( ( '+' | '-' ) MulDiv )*
+// MulDiv      ::= Pow ( ( '*' | '/' ) Pow )*
+// Pow         ::= Unary ('^' Unary )*
+// Unary       ::= ( '+' | '-' | FuncOper )? Primary
+// FuncOper    ::= 'sin' | 'cos' | 'tg' | 'ln' | 'sqrt'
+// Primary     ::= '(' Expression ')'| Var | Number | FuncCall
 //
-// Var        ::= ID
-// ID         ::= ([a-z] | [A-Z])+
-// Num        ::= ['0'-'9']+ 
+// Var         ::= ID
+// ID          ::= ([a-z] | [A-Z])+
+// Num         ::= ['0'-'9']+ 
 /*-------------------------------------------------------------------------*/
 
 static Node* getProgram   (size_t* pos, const Vector tokens);
@@ -73,7 +73,7 @@ static Node* getPrimary   (size_t* pos, const Vector tokens);
     {                      \
         if (!IS(type))     \
         {                  \
-            sintaxError(); \
+            syntaxError(); \
             return nullptr;\
         }                  \
         (*pos)++;          \
@@ -153,7 +153,7 @@ static Node* getStatement(size_t* pos, const Vector tokens)
         if (*pos + 1 >= tokens.size)                          return nullptr;
         if      (NEXT()->value.op == KEY_BUDET_OPERATION)     return getAssignment(pos, tokens);
         else if (NEXT()->value.op == KEY_PRIBUDET_OPERATION)  return getVarDef    (pos, tokens);
-        else    {sintaxError(); return nullptr;}
+        else    {syntaxError(); return nullptr;}
     }
     else if (IS(KEY_ZAMYSEL_OPERATION))     return getFuncDef  (pos, tokens);
     else if (IS(KEY_VOZVRATISHI_OPERATION)) return getReturn   (pos, tokens);
@@ -161,7 +161,7 @@ static Node* getStatement(size_t* pos, const Vector tokens)
     else if (IS(KEY_GLAGOLI_OPERATION))     return getPrint    (pos, tokens);
     else if (isIdentifier(CUR()) && NEXT()->value.op == KEY_LEFT_PARENTHESIS_OPERATION)
                                             return getFuncCall (pos, tokens);
-    else {sintaxError(); return nullptr;}
+    else {syntaxError(); return nullptr;}
 
     return nullptr; 
 }
@@ -199,7 +199,6 @@ static Node* getWhileStmt(size_t* pos, const Vector tokens)
 //------------------------------------------------------------------------------
 static Node* getAssignment(size_t* pos, const Vector tokens)
 {
-    PRINT(4);
     REQUIRE(KEY_DA_OPERATION);
     REQUIRE(KEY_BUDET_OPERATION);
 
@@ -226,7 +225,7 @@ static Node* getVarDef(size_t* pos, const Vector tokens)
     (*pos)++;
     if (*pos >= tokens.size || !IS(KEY_PODOBNO_OPERATION)) 
     {
-        sintaxError();
+        syntaxError();
         return nullptr;
     }
     REQUIRE(KEY_PODOBNO_OPERATION);
@@ -242,18 +241,9 @@ static Node* getFuncDef(size_t* pos, const Vector tokens)
 {
     REQUIRE(KEY_ZAMYSEL_OPERATION);
 
-    Node* idTok  = CUR();
-
-    char* fName = strdup(idTok->value.id);
-    if (!fName) 
-    {
-        fprintf(stderr, RED"Memory allocation failed\n"RED);
-        sintaxError();
-        return nullptr;
-    }
-
-    Node*  idNode = _ID(fName);
-    (*pos)++;              
+    Node* nameTok = CUR();
+    Node* name    = _ID(strdup(nameTok->value.id));
+    (*pos)++;
 
     REQUIRE(KEY_LEFT_PARENTHESIS_OPERATION);
     Node* params = nullptr;
@@ -265,11 +255,11 @@ static Node* getFuncDef(size_t* pos, const Vector tokens)
     Node* body = getStmtList(pos, tokens);
     REQUIRE(KEY_RIGHT_CURLY_BRACKET_OPERATION);
 
-    Node* def = _FUNC_DEF(params, body);
-    def->left = idNode;                      
+    Node* def  = _FUNC_DEF(name, body);
+    name->left = params;        
+
     return def;
 }
-
 //------------------------------------------------------------------------------
 //  ParamList ::= Var { ',' Var }
 //------------------------------------------------------------------------------
@@ -307,7 +297,7 @@ static Node* getInput(size_t* pos, const Vector tokens)
     REQUIRE(KEY_POZHERTVUI_OPERATION);
     REQUIRE(KEY_RADI_OPERATION);
     Node* idTok = CUR();
-    Node* var    = _ID(strdup(idTok->value.id));
+    Node* var   = _ID(strdup(idTok->value.id));
     (*pos)++;
     return _INPUT(var);
 }
@@ -328,7 +318,7 @@ static Node* getPrint(size_t* pos, const Vector tokens)
 //------------------------------------------------------------------------------
 static Node* getFuncCall(size_t* pos, const Vector tokens)
 {
-    Node* idTok = CUR();
+    Node* idTok  = CUR();
     Node* callee = _ID(strdup(idTok->value.id));
     (*pos)++;
 
@@ -395,7 +385,7 @@ static Node* getRel(size_t* pos, const Vector tokens)
             case KEY_GREATER_OPERATION:           node = _GREATER(node, rhs);           break;
             case KEY_LESS_OR_EQUAL_OPERATION:     node = _LESS_OR_EQUAL(node, rhs);     break;
             case KEY_GREATER_OR_EQUAL_OPERATION:  node = _GREATER_OR_EQUAL(node, rhs);  break;
-            default: {sintaxError(); return nullptr;}
+            default: {syntaxError(); return nullptr;}
         }
     }
     return node;
@@ -474,21 +464,22 @@ static Node* getFuncOper(size_t* pos, const Vector tokens)
         case KEY_TG_OPERATION:   return _TG  (arg);
         case KEY_LN_OPERATION:   return _LN  (arg);
         case KEY_SQRT_OPERATION: return _SQRT(arg);
-        default: {sintaxError(); return nullptr;}
+        default: {syntaxError(); return nullptr;}
     }
 }
 
 //------------------------------------------------------------------------------
-//  Primary ::= '(' Expression ')'| Var | Number 
+//  Primary ::= '(' Expression ')'| Var | Number | FuncCall
 //------------------------------------------------------------------------------
 static Node* getPrimary(size_t* pos, const Vector tokens)
 {
     if (*pos >= tokens.size || !CUR()) 
     {
-        sintaxError();
+        syntaxError();
         return nullptr;
     }
 
+    /* ---------------- ( Expression ) ---------------- */
     if (IS(KEY_LEFT_PARENTHESIS_OPERATION))
     {
         (*pos)++;;
@@ -496,17 +487,28 @@ static Node* getPrimary(size_t* pos, const Vector tokens)
         REQUIRE(KEY_RIGHT_PARENTHESIS_OPERATION);
         return expr;
     }
-    else if (isNumber(CUR()))
+    
+    /* ------------------- Number --------------------- */
+    if (isNumber(CUR()))
     {
         double val = CUR()->value.num;
         (*pos)++;;
         return _NUM(val);
     }
-    else if (isIdentifier(CUR()))
+
+    /* --------------- Var  |  FuncCall --------------- */
+    if (isIdentifier(CUR()))
     {
+        if (*pos + 1 < tokens.size && NEXT()->value.op == KEY_LEFT_PARENTHESIS_OPERATION)
+        {
+            return getFuncCall(pos, tokens);      
+        }
+
         char* name = strdup(CUR()->value.id);
-        (*pos)++;;
+        (*pos)++;
         return _ID(name);
     }
-    else {sintaxError(); return nullptr;}
+
+    syntaxError(); 
+    return nullptr;
 }

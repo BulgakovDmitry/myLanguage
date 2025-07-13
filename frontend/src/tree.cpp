@@ -1,6 +1,10 @@
 #include "../headers/tree.hpp"
 #include <myLib.hpp>
 
+static void dumpListNodes(Node* node, FILE* file);
+static void dumpConnectNodes(Node* node, FILE* file);
+static void caseOperation(Node* node, const char* operation, FILE* file);
+
 Node* newNode(Type type, Value value, Node* left, Node* right)
 {
     Node* node = (Node*)calloc(1, sizeof(Node));
@@ -70,16 +74,11 @@ void deleteNode(Node* node)
     FREE(node);
 }
 
-/*void dumpGraph(Node* node, FILE* file)
+void dumpGraph(Node* node)
 {
     ASSERT(node, "node = nullptr", stderr);
-    ASSERT(file, "file = nullptr", stderr);
 
-
-    //snprintf(gvPath,  sizeof(gvPath),  "dumpGraph/%s.gv",  filePrefix);
-    //snprintf(pngPath, sizeof(pngPath), "dumpGraph/%s.png", filePrefix);
-
-    FILE* gv = fopen("dumpGraph.gv", "wb");
+    FILE* gv = fopen(DUMP_FILE_GV, "wb");
     ASSERT(gv, "dumpGraph fopen", stderr);
 
     fprintf(gv, "digraph G {\n");
@@ -94,13 +93,108 @@ void deleteNode(Node* node)
     FCLOSE(gv);
 
     char cmd[2 * MAX_NAME_FILE_LEN + EXTRA_SPACE] = "";
-    snprintf(cmd, sizeof(cmd), "dot %s -Tpng -o %s", gvPath, pngPath);
+    snprintf(cmd, sizeof(cmd), "dot %s -Tpng -o %s", DUMP_FILE_GV, DUMP_FILE_PNG);
     system(cmd);
+}
 
-    fprintf(html,
-        "<div class=\"pair\">"
-        "<img src=\"%s.png\" alt=\"%s\">"
-        "<span>it's %s</span>"
-        "</div>\n",
-        filePrefix, filePrefix, filePrefix);
-}*/
+#define DUMP_OP(op, str)  case op: caseOperation(node, str, file); break
+
+static void dumpListNodes(Node* node, FILE* file)
+{
+    ASSERT(node, "node = nullptr", stderr);
+    ASSERT(file, "dumpTreeFile = nullptr", stderr);
+
+    if (node->type == TYPE_NUMBER)
+    {
+        fprintf(file,
+            "    node_%p [shape=Mrecord; style = filled; fillcolor = palegreen;"
+            " color = \"#000000\"; fontcolor = \"#000000\";  label=\" "
+            " {NUMBER ( %lg )| addr: %llX | type: %d| value: %lg | {left: %llX | right: %llX}} \"];\n",
+                        node, node->value.num, (long long unsigned int)node, (int)node->type, node->value.num,
+                        (long long unsigned int)node->left, (long long unsigned int)node->right);                                                                                                   
+    }
+    if (node->type == TYPE_IDENTIFIER)
+    {   
+        fprintf(file,
+            "    node_%p [shape=Mrecord; style = filled; fillcolor = cornflowerblue;"
+            " color = \"#000000\"; fontcolor = \"#000000\";  label=\" "
+            " {VARIABLE ( %s )| addr: %llX | type: %d| value: %s | {left: %llX | right: %llX}} \"];\n",
+                        node, node->value.id, (long long unsigned int)node, (int)node->type, node->value.id, 
+                        (long long unsigned int)node->left, (long long unsigned int)node->right);                                                                                                                
+    }
+    if (node->type == TYPE_OPERATION)
+    {
+        switch (node->value.op)
+        {
+            DUMP_OP(OPERATION_BOND, ";");
+            DUMP_OP(OPERATION_FUNC_DEF, "funcDef");
+            DUMP_OP(OPERATION_CALL, "call");
+            DUMP_OP(OPERARION_RETURN, "return");
+            DUMP_OP(OPERATION_ASSIGNMENT, "=");
+            DUMP_OP(OPERATION_IF, "if");
+            DUMP_OP(OPERATION_WHILE, "while");
+            DUMP_OP(OPERATION_PRINT, "print");
+            DUMP_OP(OPERATION_INPUT, "scan");
+            DUMP_OP(OPERATION_EQUAL, "==");
+            DUMP_OP(OPERATION_NOT_EQUAL, "!=");
+            DUMP_OP(OPERATION_GREATER, "\\>");
+            DUMP_OP(OPERATION_LESS, "\\<");
+            DUMP_OP(OPERATION_GREATER_OR_EQUAL, "\\>=");
+            DUMP_OP(OPERATION_LESS_OR_EQUAL, "\\<=");
+            DUMP_OP(OPERATION_VAR_DEF, "varDef");
+            DUMP_OP(OPERATION_SQRT, "sqrt");
+            DUMP_OP(OPERATION_SIN, "sin");
+            DUMP_OP(OPERATION_COS, "cos");
+            DUMP_OP(OPERATION_TG, "tg");
+            DUMP_OP(OPERATION_LN, "ln");
+            DUMP_OP(OPERATION_ADD,   "+");
+            DUMP_OP(OPERATION_SUB,   "-");
+            DUMP_OP(OPERATION_MUL,   "*");
+            DUMP_OP(OPERATION_DIV,   "/");
+            DUMP_OP(OPERATION_POW,   "^");
+            default:
+            {
+                fprintf(stderr, RED"ERROR IN DUMP\n"RESET);
+                break;
+            }
+        }                                                                                      
+    }
+    
+    if (node->left)  dumpListNodes(node->left,  file);
+    if (node->right) dumpListNodes(node->right, file);
+}
+
+#undef DUMP_OP
+
+static void caseOperation(Node* node, const char* operation, FILE* file)
+{
+    ASSERT(node,      "node = nullptr",         stderr);
+    ASSERT(operation, "operation = nullptr",    stderr);
+    ASSERT(file,      "dumpTreeFile = nullptr", stderr);
+
+    fprintf(file, 
+        "node_%p [shape=Mrecord; style = filled; fillcolor=plum; color = \"#000000\"; fontcolor = \"#000000\";"
+        "label=\" {OPERATION ( %s ) | addr: %llX | type: %d | value: %zu | {left: %llX | right: %llX}} \"];\n", 
+                node, operation, (long long unsigned int)node, node->type, node->value.op, 
+                (long long unsigned int)node->left, (long long unsigned int)node->right);                                                                                                          
+}
+
+static void dumpConnectNodes(Node* node, FILE* file)
+{
+    ASSERT(node, "node = nullptr", stderr);
+    ASSERT(file, "file = nullptr", stderr);
+    
+    if (!node) return;
+    
+    if (node->left)  
+    { 
+        fprintf(file, "    node_%p -> node_%p;\n", node, node->left);  
+        dumpConnectNodes(node->left, file); 
+    }
+
+    if (node->right) 
+    { 
+        fprintf(file, "    node_%p -> node_%p;\n", node, node->right); 
+        dumpConnectNodes(node->right, file); 
+    }
+}

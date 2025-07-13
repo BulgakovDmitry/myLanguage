@@ -1,3 +1,12 @@
-da pribudet x podobno 5 don
+zamysel bogatit ( x )
+{
+    dokole ( x < 10 )
+    {
+        da budet x podobno x + 1 don
+    } don
+    vozvratishi x don
+} don
+
+da pribudet y podobno bogatit ( 5 ) don
 
 amin

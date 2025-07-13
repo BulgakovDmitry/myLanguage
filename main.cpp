@@ -9,12 +9,15 @@ int main()
     FILE* codeFile = fopen(codeFileName, "r");
     ASSERT(codeFile, "codeFile = nullptr, impossible to read", stderr);
     
-    Vector tokens = splitIntoTokens(codeFile); 
+    Vector tokens = lexicalAnalysis(codeFile); 
     FCLOSE(codeFile);           
 
     tokenDump(tokens);
 
     Node* root = syntaxAnalysis(tokens);
+    ASSERT(root, "root = nullptr, error in syntax analysis", stderr);
+
+    dumpGraph(root);
 
     destroyTokens(&tokens);
     dtorTree(root);

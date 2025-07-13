@@ -94,7 +94,7 @@ struct KeyWord
     bool keyWordFlag;
 };
 
-Vector splitIntoTokens(FILE* codeFile);
+Vector lexicalAnalysis(FILE* codeFile);
 void   tokenDump      (const Vector tokens);
 void   destroyTokens  (Vector* tokens);
 

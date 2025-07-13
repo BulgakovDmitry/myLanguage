@@ -5,7 +5,7 @@
 
 static KeyWord isKeyWord(const char* word);
 
-Vector splitIntoTokens(FILE* codeFile)
+Vector lexicalAnalysis(FILE* codeFile)
 {
     ASSERT(codeFile, "codeFile = nullptr, impossible to read", stderr);
 
