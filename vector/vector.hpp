@@ -35,9 +35,9 @@ struct Vector
     size_t   coefCapacity;
     uint64_t errorStatus;
 
-    void** data;
-    size_t       size;
-    size_t       capacity;
+    void**  data;
+    size_t  size;
+    size_t  capacity;
 
     #ifdef VECTOR_HASH_PROTECTION
     uint64_t dataHashSum;

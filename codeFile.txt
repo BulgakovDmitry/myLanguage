@@ -1,12 +1,3 @@
-zamysel bogatit ( x )
-{
-    koli ( x < 10 )
-    {
-        da budet x podobno x * 0 don
-    } don
-    vozvratiti x don
-} don
-
-da pribudet y podobno bogatit ( 5 ) don
+da pribudet y podobno 5 don
 
 amin

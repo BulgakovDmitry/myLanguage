@@ -61,8 +61,10 @@ enum Operations
 const size_t MAX_NAME_FILE_LEN = 32;
 const size_t EXTRA_SPACE       = 15;
 
-const char* const DUMP_FILE_GV  = "frontend/graphDump/dumpGraph.gv";
-const char* const DUMP_FILE_PNG = "frontend/graphDump/dumpGraph.png";
+const char* const DUMP_FILE_GV        = "frontend/graphDump/dumpGraph.gv";
+const char* const DUMP_FILE_PNG       = "frontend/graphDump/dumpGraph.png";
+const char* const ASSEMBLER_FILE_NAME = "spu/assemblerFile.txt";
+
 
 Node* newNode   (Type type, Value value, Node* left, Node* right);
 void  deleteNode(Node* node); 

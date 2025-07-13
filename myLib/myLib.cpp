@@ -13,16 +13,26 @@ size_t getFileSize(FILE* file)
     return size;
 }
 
-char* readFileToBuffer(FILE* file, size_t size_file)
+char* readFileToBuffer(FILE* file)
 {
     ASSERT(file, "file = NULL, it is impossible to work with null ptr", stderr);
-    ASSERT(size_file, "size_file should not be null", stderr);
 
-    char* buffer = (char*)calloc(size_file, sizeof(char));    // СОЗДАНИЕ БУФФЕРА
-    ASSERT(buffer, "buffer = NULL, it is impossible to work with null ptr", stderr);
+    size_t size_file = getFileSize((file));
 
-    size_file = fread(buffer, sizeof(char), size_file, file); // ЗАПОЛЕНИЕ БУФФЕРА
+    char* buffer = (char*)(calloc(size_file + 1, sizeof(char)));
+    ASSERT(buffer, "calloc return null buffer error", stderr);
 
+    rewind(file);
+
+    size_t read = fread(buffer, sizeof(char), size_file, file);
+    if (read != (size_file))      
+    {
+        free(buffer);
+        return nullptr;
+    }
+
+    buffer[size_file] = '\0';
+    
     return buffer;
 }
 

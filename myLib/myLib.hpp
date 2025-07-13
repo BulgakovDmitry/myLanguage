@@ -83,7 +83,7 @@
 
 /*===============================================_____WORKING_WITH_FILES_____===================================*/
 size_t getFileSize(FILE* file);
-char*  readFileToBuffer(FILE* file, size_t size_file);
+char*  readFileToBuffer(FILE* file);
 /*==============================================================================================================*/
 
 
