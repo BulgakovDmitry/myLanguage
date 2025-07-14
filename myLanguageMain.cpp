@@ -1,6 +1,7 @@
 #include "frontend/headers/lexicalAnalysis.hpp"
 #include "frontend/headers/syntaxAnalysis.hpp"
 #include "middleend/headers/optimizations.hpp"
+#include "backend/headers/codeGenerator.hpp"
 #include <myLib.hpp>
 
 extern const char* const codeFileName;
@@ -24,6 +25,13 @@ int main()
     dumpGraph(root);
 
     destroyTokens(&tokens);
+
+    FILE* asmFile = fopen(ASSEMBLER_FILE_NAME, "w");
+    ASSERT(asmFile, "asmFile = nullptr, impossible to write asm code", stderr);
+
+    translate(root, asmFile);
+    FCLOSE(asmFile);
+
     dtorTree(root);
     //dtorTree(rootWithOpt);
 

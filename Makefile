@@ -48,6 +48,7 @@ STACK_OBJ     = $(OBJ)stack.o $(OBJ)myLib.o
 COMMON_OBJ    = $(OBJ)tree.o
 FRONTEND_OBJ  = $(OBJ)lexicalAnalysis.o $(OBJ)syntaxAnalysis.o
 MIDDLEEND_OBJ = $(OBJ)optimizations.o
+BACKEND_OBJ   = $(OBJ)codeGenerator.o
 PROC_OBJ      = $(OBJ)proc.o $(OBJ)mainProc.o  $(OBJ)myLib.o
 ASM_OBJ       = $(OBJ)asm.o $(OBJ)mainAsm.o $(OBJ)myLib.o
 #--------------------------------------------------------------------------------------------------
@@ -64,10 +65,12 @@ asm_: asm
 proc_: proc
 	./proc.out
 
-run: language
-
-run_: language
+language_: language
 	./language.out
+
+run: language spu
+
+run_: language_ spu_
 #--------------------------------------------------------------------------------------------------
      
 
@@ -78,7 +81,7 @@ clean:
 
 
 #--------------------------------------------------------------------------------------------------
-language: $(MYLIB_OBJ) $(VECTOR_OBJ) $(COMMON_OBJ) $(FRONTEND_OBJ) $(MIDDLEEND_OBJ) $(OBJ)myLanguageMain.o 
+language: $(MYLIB_OBJ) $(VECTOR_OBJ) $(COMMON_OBJ) $(FRONTEND_OBJ) $(MIDDLEEND_OBJ) $(BACKEND_OBJ) $(OBJ)myLanguageMain.o 
 	$(COMPILER) $^ -o language.out $(FLAGS)
 
 asm: $(ASM_OBJ)
@@ -106,6 +109,9 @@ $(OBJ)%.o : $(FRON)$(SRC)%.cpp
 	$(COMPILER) $(FLAGS) -c $< -o $@
 
 $(OBJ)%.o : $(MIDD)$(SRC)%.cpp
+	$(COMPILER) $(FLAGS) -c $< -o $@
+
+$(OBJ)%.o : $(BACK)$(SRC)%.cpp
 	$(COMPILER) $(FLAGS) -c $< -o $@
 
 $(OBJ)%.o : $(SPU)$(ASM)$(SRC)%.cpp

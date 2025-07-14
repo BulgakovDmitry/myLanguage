@@ -1,3 +1,10 @@
-da pribudet y podobno 5 don
+zamysel inc ( a , b )
+{
+    da budet a podobno a + 1 don
+    da budet b podobno b + 2 don
+    vozvratiti a don
+} don
+
+da pribudet y podobno inc ( 5 , 15 ) don
 
 amin

@@ -113,7 +113,7 @@ void asembler(Asm* asem, FILE* assembler)
     char* buffer = readFileToBuffer(assembler);      
     assert(buffer);
 
-    char command_recognizer[10] = "";
+    char command_recognizer[MAX_LABEL_SIZE] = "";
     int shift = 0;  
 
     findLabel(asem, buffer, &shift, command_recognizer); 
@@ -225,7 +225,7 @@ void findLabel(Asm* asem, char* buffer, int* shift, char command_recognizer[])
     {   
         int read = 0;
 
-        if (sscanf(buffer + pos, "%9s%n", command_recognizer, &read) != 1)
+        if (sscanf(buffer + pos, "%s%n", command_recognizer, &read) != 1)
             break; 
 
         pos += read;   

@@ -11,7 +11,7 @@
 #include <stdbool.h>
 
 static const int SPACE          = 1 ;
-static const int LEN_REG        = 8 ;
+static const int LEN_REG        = 20 ;
 static const int MAX_LABEL_SIZE = 40;
 
 struct Labels

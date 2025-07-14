@@ -1,7 +1,32 @@
-push 4
+jmp main
+
+inc:
+push [0]
+push 1
+add
+pop [0]
+push [1]
+push 2
+add
+pop [1]
+push [0]
+ret
+
+main:
+push [0]
+push 1
+add
+pop [0]
+push [1]
+push 2
+add
+pop [1]
+push [0]
+ret
+ret
 push 5
+push 15
+call inc
+pop [2]
 dump
 hlt
-
-
-
