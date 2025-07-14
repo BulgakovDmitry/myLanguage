@@ -1,32 +1,23 @@
 jmp main
 
-inc:
-push [0]
-push 1
-add
+func:
 pop [0]
-push [1]
-push 2
-add
-pop [1]
+push [0]
+push 10
+jae endIf_0
+push 10
+pop [0]
+jmp endIf_0
+endIf_0:
 push [0]
 ret
 
 main:
-push [0]
-push 1
-add
-pop [0]
-push [1]
-push 2
-add
-pop [1]
-push [0]
-ret
-ret
 push 5
-push 15
-call inc
-pop [2]
-dump
+pop [1]
+push [1]
+call func
+pop [1]
+push [1]
+out
 hlt

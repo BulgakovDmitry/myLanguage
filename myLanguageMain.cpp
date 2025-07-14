@@ -19,8 +19,8 @@ int main()
     Node* root = syntaxAnalysis(tokens);
     ASSERT(root, "root = nullptr, error in syntax analysis", stderr);
 
-    //Node* rootWithOpt = simplify(copy(root));
-    //ASSERT(rootWithOpt, "rootWithOpt = nullptr, error in meddle end", stderr);
+    Node* rootWithOpt = simplify(copy(root));
+    ASSERT(rootWithOpt, "rootWithOpt = nullptr, error in meddle end", stderr);
 
     dumpGraph(root);
 
@@ -33,7 +33,7 @@ int main()
     FCLOSE(asmFile);
 
     dtorTree(root);
-    //dtorTree(rootWithOpt);
+    dtorTree(rootWithOpt);
 
     return 0;
 }

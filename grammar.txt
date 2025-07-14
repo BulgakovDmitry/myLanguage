@@ -10,14 +10,14 @@ WhileStmt   ::= 'dokole' Expression '{' StmtList '}'
 
 Assignment  ::= 'da' 'budet'    Var 'podobno' Expression
 VarDef      ::= 'da' 'pribudet' Var 'podobno' Expression 
-FuncDef     ::= 'zamysel' ID '(' [ ParamList ] ')' '{' StmtList '}'
-ParamList   ::= Var { ',' Var }
+FuncDef     ::= 'zamysel' ID '(' ParamList ')' '{' StmtList '}'
+ParamList   ::= Var ( ',' Var )*
 
 Return      ::= 'vozvratishi' Expression
 Input       ::= 'pozhertvui' 'radi' Var
 Print       ::= 'glagoli' 'yasno' Expression
-FuncCall    ::= ID '(' [ ArgList ] ')'
-ArgList     ::= Expression { ',' Expression }
+FuncCall    ::= ID '(' ArgList ')'
+ArgList     ::= Expression ( ',' Expression )*
 
 Expression  ::= Equality
 Equality    ::= Rel ( ( '==' | '!=' ) Rel )*

@@ -16,14 +16,14 @@
 //
 // Assignment  ::= 'da' 'budet'    Var 'podobno' Expression
 // VarDef      ::= 'da' 'pribudet' Var 'podobno' Expression 
-// FuncDef     ::= 'zamysel' ID '(' [ ParamList ] ')' '{' StmtList '}'
-// ParamList   ::= Var { ',' Var }
+// FuncDef     ::= 'zamysel' ID '(' ParamList ')' '{' StmtList '}'
+// ParamList   ::= Var ( ',' Var )*
 //
 // Return      ::= 'vozvratiti' Expression
 // Input       ::= 'pozhertvui' 'radi' Var
 // Print       ::= 'glagoli' 'yasno' Expression
-// FuncCall    ::= ID '(' [ ArgList ] ')'
-// ArgList     ::= Expression { ',' Expression }
+// FuncCall    ::= ID '(' ArgList ')'
+// ArgList     ::= Expression ( ',' Expression )*
 //
 // Expression  ::= Equality
 // Equality    ::= Rel ( ( '==' | '!=' ) Rel )*
@@ -235,7 +235,7 @@ static Node* getVarDef(size_t* pos, const Vector tokens)
 }
 
 //------------------------------------------------------------------------------
-//  FuncDef ::= 'zamysel' ID '(' [ ParamList ] ')' '{' StmtList '}'
+//  FuncDef ::= 'zamysel' ID '(' ParamList ')' '{' StmtList '}'
 //------------------------------------------------------------------------------
 static Node* getFuncDef(size_t* pos, const Vector tokens)
 {
@@ -261,7 +261,7 @@ static Node* getFuncDef(size_t* pos, const Vector tokens)
     return def;
 }
 //------------------------------------------------------------------------------
-//  ParamList ::= Var { ',' Var }
+//  ParamList ::= Var ( ',' Var )
 //------------------------------------------------------------------------------
 static Node* getParamList(size_t* pos, const Vector tokens)
 {
@@ -314,7 +314,7 @@ static Node* getPrint(size_t* pos, const Vector tokens)
 }
 
 //------------------------------------------------------------------------------
-//  FuncCall ::= ID '(' [ ArgList ] ')'
+//  FuncCall ::= ID '(' ArgList ')'
 //------------------------------------------------------------------------------
 static Node* getFuncCall(size_t* pos, const Vector tokens)
 {
