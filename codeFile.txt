@@ -1,10 +1,14 @@
-zamysel inc ( a , b )
+zamysel func ( a )
 {
-    da budet a podobno a + 1 don
-    da budet b podobno b + 2 don
+    koli ( a < 10 )
+    {
+        da budet a podobno 10 don
+    } don
     vozvratiti a don
 } don
 
-da pribudet y podobno inc ( 5 , 15 ) don
+da pribudet x podobno 5 don
+da budet x podobno func ( x ) don
+glagoli yasno x don
 
 amin

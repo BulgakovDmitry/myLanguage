@@ -16,11 +16,13 @@ static void translateBond      (const Node* node, FILE* file);
 static void translateIf        (const Node* node, FILE* file);
 static void translateWhile     (const Node* node, FILE* file);
 
+static void countFuncArg(const Node* node, size_t* counter);
+
 static VarEntry gVarTable[MAX_VARS] = {};
 
-static int      gVarCount  = 0;   /* number of used entries             */
-static int      gNextAddr  = 0;   /* next free RAM cell for variables   */
-static int      gLabelCnt  = 0;   /* counter for unique labels          */
+static int gVarCount  = 0;   
+static int gNextAddr  = 0;   
+static int gLabelCnt  = 0;   
 
 void translate(const Node* root, FILE* file)
 {
@@ -37,7 +39,7 @@ void translate(const Node* root, FILE* file)
     fprintf(file, "main:\n");
     emitMain(root, file);
 
-    fprintf(file, "dump\n");
+    //fprintf(file, "dump\n");
     fprintf(file, "hlt\n");
 
     for (size_t i = 0; i < MAX_VARS; i++)
@@ -121,7 +123,7 @@ static void translateNode(const Node* node, FILE* file)
         case OPERATION_CALL:
         {
             if (node->right)
-                translateNode(node->right, file);   /* push arguments */
+                translateNode(node->right, file);   // push arguments 
 
             fprintf(file, "call %s\n", node->left->value.id);
             break;
@@ -129,18 +131,15 @@ static void translateNode(const Node* node, FILE* file)
         case OPERATION_BOND: {translateBond(node, file); break;}
         case OPERATION_IF: {translateIf(node, file); break;}
         case OPERATION_WHILE: {translateWhile(node, file); break;}
-        case OPERATION_FUNC_DEF:
-        {
-
-        }
+        case OPERATION_FUNC_DEF: {break;}
         case OPERARION_RETURN:
             if (node->right)
                 translateNode(node->right, file);
-            fprintf(file, "ret\n");
+            fprintf(file, "ret\n\n");
             break;
 
         default:
-            fprintf(stderr, "translate(): unknown OPERATION %d\n", (int)node->value.op);
+            fprintf(stderr, RED"translate(): unknown OPERATION %d\n"RESET, (int)node->value.op);
             break;
         }
         break; 
@@ -183,8 +182,16 @@ static void emitFunctions(const Node* node, FILE* file)
         const char* funcName = node->left->value.id;
         fprintf(file, "%s:\n", funcName);
 
+        size_t nArgs = 0;
+        if (node->left->left)
+            countFuncArg(node->left->left, &nArgs);
+        
+        for (size_t i = 0; i < nArgs; i++)
+        {
+            fprintf(file, "pop [%zu]\n",  nArgs - i - 1);
+        }
+        
         translateNode(node->right, file);
-        //fprintf(file, "ret\n\n");
         return;             
     }
 
@@ -326,3 +333,18 @@ static void translateWhile(const Node* node, FILE* file)
     fprintf(file, "%s:\n",  labelEnd);             // end:
 }
 
+static void countFuncArg(const Node* node, size_t* counter)
+{
+    ASSERT(node,    "node = nullptr, impossible to count args", stderr);
+    ASSERT(counter, "counter = nullprt",                        stderr);
+
+
+    if (node->value.op == OPERATION_BOND)
+    {
+        (*counter)++;
+        countFuncArg(node->left, counter);
+    }
+
+    if (node && node->value.op != (Type)OPERATION_BOND)
+        (*counter)++;
+}
