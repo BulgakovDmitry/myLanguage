@@ -25,9 +25,9 @@ sudo apt install graphviz
 
 ## 🔍 Overview:
 The language consists of 3 parts:
-- frontend
-- middleend
-- backend
+- [Frontend](#frontend)
+- [Middleend](middleend)
+- [Backend](#backend)
 
 ## Frontend
 Frontend translates text into a binary tree. Below is an example of tree structure.
@@ -112,3 +112,91 @@ Num         ::= ['0'-'9']+
 ```
 Tree parsing is implemented by recursive descent algorithm.
 As a result of the algorithm, we get a binary tree. Below is a fragment of its graphical dump:
+<div align="center">
+  <img src="docs/dumpGraph.png" alt="Lang Banner" width="1000">  
+</div>
+
+## Middleend
+This block is used to manage the tree. 
+In my implementation there are only arithmetic operations: addition and subtraction with zero, multiplication by zero, multiplication by one, division by one, ascending to zero and first degree, convolution of constants (with internal calculation of arithmetic expression).
+The result is a simplified tree that is faster to process.
+For example, if the following mathematical expression occurred in the tree:
+<div align="center">
+  <img src="docs/root.png" alt="Root Banner" width="1000">  
+</div>
+Then this tree will be replaced by the following
+<div align="center">
+  <img src="docs/rootSimpl.png" alt="RootSimple Banner" width="300">  
+</div>
+Middlend makes the program simpler and executes faster
+
+## Backend
+Backend task to translate the tree obtained by the frontend into code for spu.
+The backend writes the jmp command to the main label at the beginning, then writes out the function implementations. 
+Functions are organized according to the following structure: first the function label is written, after that you may encounter lines with the pop command - this is the receipt by the function of its arguments, only after that comes the body of the function and the final ret.
+Here is an example of function realization (discriminant counting):
+```asm
+deskriminati:
+pop [2]
+pop [1]
+pop [0]
+push 0
+pop [3]
+push [1]
+push [1]
+mul
+push 4
+push [0]
+mul
+push [2]
+mul
+sub
+pop [3]
+push [3]
+ret
+```
+After all functions are declared, the main label is written to spu, after which the main program code begins. This structure is implemented for the convenience of human understanding of the code and the structuredness of assembly code.
+
+## 💡 Usage example:
+Here is an example of a program written in “DREVNERUS++” language for solving quadratic equations:
+```txt
+zamysel deskriminati ( A , B , C )
+{
+    da pribudet D podobno 0 don
+    da budet D podobno B * B - 4 * A * C don
+    vozvratiti D don
+} don
+
+da pribudet a podobno 0 don
+da pribudet b podobno 0 don
+da pribudet c podobno 0 don
+
+pozhertvui radi a don
+pozhertvui radi b don
+pozhertvui radi c don
+
+da pribudet d podobno deskriminati ( a , b , c ) don
+
+koli ( d > 0 )
+{
+    da pribudet q podobno sqrt d don 
+    da pribudet x podobno ( 0 - b - q ) / ( 2 * a ) don
+    da pribudet y podobno ( 0 - b + q ) / ( 2 * a ) don
+    glagoli yasno x don
+    glagoli yasno y don
+} don
+
+koli ( d == 0 )
+{
+    da pribudet z podobno ( 0 - b ) / ( 2 * a ) don
+    glagoli yasno z don
+} don
+
+amin
+```
+Run our program:
+<div align="center">
+  <img src="docs/slvSq.png" alt="Example Banner" width="700">  
+</div>
+the program asks the user to enter coefficients a b c from the keyboard.
+After which we see the output of two numbers (-1 and 2). These are the obtained roots
