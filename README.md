@@ -26,7 +26,7 @@ sudo apt install graphviz
 ## 🔍 Overview:
 The language consists of 3 parts:
 - [Frontend](#frontend)
-- [Middleend](middleend)
+- [Middleend](#middleend)
 - [Backend](#backend)
 
 ## Frontend
