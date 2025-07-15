@@ -15,12 +15,12 @@ union Value
 {
     double num;
     size_t op;
-    char* id;
+    char*  id;
 };
 
 struct Node
 {
-    Type type;
+    Type  type;
     Value value;
     Node* left;
     Node* right;

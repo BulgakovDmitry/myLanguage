@@ -1,14 +1,33 @@
-zamysel func ( a )
+zamysel deskriminati ( A , B , C )
 {
-    koli ( a < 10 )
-    {
-        da budet a podobno 10 don
-    } don
-    vozvratiti a don
+    da pribudet D podobno 0 don
+    da budet D podobno B * B - 4 * A * C don
+    vozvratiti D don
 } don
 
-da pribudet x podobno 5 don
-da budet x podobno func ( x ) don
-glagoli yasno x don
+da pribudet a podobno 0 don
+da pribudet b podobno 0 don
+da pribudet c podobno 0 don
+
+pozhertvui radi a don
+pozhertvui radi b don
+pozhertvui radi c don
+
+da pribudet d podobno deskriminati ( a , b , c ) don
+
+koli ( d > 0 )
+{
+    da pribudet q podobno sqrt d don 
+    da pribudet x podobno ( 0 - b - q ) / ( 2 * a ) don
+    da pribudet y podobno ( 0 - b + q ) / ( 2 * a ) don
+    glagoli yasno x don
+    glagoli yasno y don
+} don
+
+koli ( d == 0 )
+{
+    da pribudet z podobno ( 0 - b ) / ( 2 * a ) don
+    glagoli yasno z don
+} don
 
 amin

@@ -89,9 +89,9 @@ enum TokenOperation
 
 struct KeyWord
 {
-    size_t keyWordOperation;
+    size_t      keyWordOperation;
     const char* keyWordName;
-    bool keyWordFlag;
+    bool        keyWordFlag;
 };
 
 Vector lexicalAnalysis(FILE* codeFile);

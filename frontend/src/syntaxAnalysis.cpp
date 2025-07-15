@@ -497,9 +497,7 @@ static Node* getPrimary(size_t* pos, const Vector tokens)
     if (isIdentifier(CUR()))
     {
         if (*pos + 1 < tokens.size && NEXT()->value.op == KEY_LEFT_PARENTHESIS_OPERATION)
-        {
             return getFuncCall(pos, tokens);      
-        }
 
         char* name = strdup(CUR()->value.id);
         (*pos)++;

@@ -17,8 +17,7 @@ static void translateWhile     (const Node* node, FILE* file);
 static void translateCall      (const Node* node, FILE* file);
 static void translateReturn    (const Node* node, FILE* file);
 
-
-static void countFuncArg(const Node* node, size_t* counter);
+static void collectArgs(const Node* argNode, const char** names, size_t* pCnt);
 
 static VarEntry gVarTable[MAX_VARS] = {};
 
@@ -98,7 +97,7 @@ static void translateNode(const Node* node, FILE* file)
                         case OPERATION_SUB: {fprintf(file, "sub\n"); break;}
                         case OPERATION_MUL: {fprintf(file, "mul\n"); break;}
                         case OPERATION_DIV: {fprintf(file, "div\n"); break;}
-                        default: break; 
+                        default:                                    {break;} 
                     }
                     break;
 
@@ -180,19 +179,47 @@ static void translateFunctions(const Node* node, FILE* file)
 
     if (node->type == TYPE_OPERATION && node->value.op == OPERATION_FUNC_DEF) 
     {
+        const char* argNames[MAX_ARGS] = {0};
+        size_t nArgs = 0;
+
+        if (node->left && node->left->left)
+            collectArgs(node->left->left, argNames, &nArgs);
+
         const char* funcName = node->left->value.id;
         fprintf(file, "%s:\n", funcName);
 
-        size_t nArgs = 0;
-        if (node->left->left)
-            countFuncArg(node->left->left, &nArgs);
-        
-        for (size_t i = 0; i < nArgs; i++)
+        int priorVarCount = gVarCount;       //Remember table size BEFORE introducing arguments
+        size_t baseAddr = (size_t)gNextAddr; // Base address for current frame
+
+        for (size_t i = 0; i < nArgs; i++) 
         {
-            fprintf(file, "pop [%zu]\n",  nArgs - i - 1);
+            bool checkNumArgs = (size_t)gVarCount < MAX_VARS;
+            ASSERT(checkNumArgs, "variable table overflow", stderr);
+            if (!argNames[i])
+            {
+                fprintf(stderr, RED"translateFunctions(): NULL arg name at pos %zu in %s\n"RESET, i, funcName);
+                continue;
+            }
+
+            strncpy(gVarTable[gVarCount].name, argNames[i], sizeof(gVarTable[0].name) - 1);
+
+            gVarTable[gVarCount].name[sizeof(gVarTable[0].name) - 1] = '\0';
+            gVarTable[gVarCount].addr = (int)(baseAddr + i);
+            ++gVarCount;
         }
+
+        for (size_t i = 0; i < nArgs; ++i) 
+        {
+            size_t addr = baseAddr + nArgs - i - 1;  
+            fprintf(file, "pop [%zu]\n", addr);
+        }
+
+        gNextAddr += (int)nArgs;  // Reserve memory for args in RAM
         
         translateNode(node->right, file);
+
+        gVarCount = priorVarCount;
+        
         return;             
     }
 
@@ -351,18 +378,21 @@ static void translateReturn(const Node* node, FILE* file)
 
     fprintf(file, "ret\n\n");
 }
-static void countFuncArg(const Node* node, size_t* counter)
+
+static void collectArgs(const Node* argNode, const char** names, size_t* pCnt)
 {
-    ASSERT(node,    "node = nullptr, impossible to count args", stderr);
-    ASSERT(counter, "counter = nullprt",                        stderr);
+    if (!argNode) return;
+    ASSERT(names, "names = nullptr, impossible to get id name", stderr);
+    ASSERT(pCnt,  "pCnt = nullptr, error",                      stderr);
 
-
-    if (node->value.op == OPERATION_BOND)
+    if (argNode->type == TYPE_OPERATION && argNode->value.op == OPERATION_BOND) 
     {
-        (*counter)++;
-        countFuncArg(node->left, counter);
+        collectArgs(argNode->left , names, pCnt);
+        collectArgs(argNode->right, names, pCnt);
+    } 
+    else if (argNode->type == TYPE_IDENTIFIER) 
+    {
+        assert(*pCnt < MAX_ARGS && "too many arguments");
+        names[(*pCnt)++] = argNode->value.id; // save name
     }
-
-    if (node && node->value.op != (Type)OPERATION_BOND)
-        (*counter)++;
 }

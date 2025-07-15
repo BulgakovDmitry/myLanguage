@@ -7,12 +7,13 @@
 struct VarEntry
 {
     char* name;  
-    int  addr;      
+    int   addr;      
 };
 
 const size_t MAX_ID_NAME_LEN = 32;
-const size_t MAX_VARS      = 1024;
-const size_t LABEL_BUF_LEN = 32;
+const size_t MAX_VARS        = 1024;
+const size_t LABEL_BUF_LEN   = 32;
+const size_t MAX_ARGS        = 8;
 
 void translate(const Node *root, FILE* file);
 
